@@ -120,6 +120,8 @@ class PaginaAvaliacao extends StatefulWidget {
 }
 
 class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
+  final TextEditingController _commentsController = TextEditingController();
+
   final Map<String, List<String>> secoes = {
     'Qualidade dos produtos': [
       'Sabor e qualidade',
@@ -157,69 +159,281 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Espaço Dona Deôla'),
-      ),
-      body: Column(
-        children: [
-          HeaderWidget(),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: secoes.entries.expand((entry) {
-                final secao = entry.key;
-                final perguntas = entry.value;
-                return [
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                    child: Text(
-                      secao,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(181, 228, 136, 74),
-                      ),
-                    ),
-                  ),
-                  ...perguntas.map((pergunta) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 6),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                flex: 3,
-                                child: Text(
-                                  pergunta,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                flex: 5,
-                                child: EmojiSelector(
-                                  selected: respostas[pergunta],
-                                  onChanged: (value) {
-                                    setState(() {
-                                      respostas[pergunta] = value;
-                                    });
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )),
-                ];
-              }).toList(),
+        backgroundColor: Colors.white,
+        title: const Text(
+          'Espaço Dona Deôla',
+          style: TextStyle(color: Colors.black),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color.fromARGB(255, 228, 136, 74),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              ),
+              onPressed: () {},
+              child: const Text('Enviar'),
             ),
           ),
-          // CustomerInfoForm(),
+        ],
+        iconTheme: const IconThemeData(color: Colors.black),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.only(bottom: 40),
+        children: [
+          HeaderWidget(),
+          ...secoes.entries.expand((entry) {
+            final secao = entry.key;
+            final perguntas = entry.value;
+            return [
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                child: Text(
+                  secao,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(181, 228, 136, 74),
+                  ),
+                ),
+              ),
+              ...perguntas.map((pergunta) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: Text(
+                              pergunta,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            flex: 5,
+                            child: EmojiSelector(
+                              selected: respostas[pergunta],
+                              onChanged: (value) {
+                                setState(() {
+                                  respostas[pergunta] = value;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )),
+            ];
+          }).toList(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+                  child: Text(
+                    'Comentário',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(181, 228, 136, 74),
+                    ),
+                  ),
+                ),
+                TextFormField(
+                  controller: _commentsController,
+                  decoration: InputDecoration(
+                    hintText: 'Deixe seu comentário aqui...',
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(181, 228, 136, 74),
+                        width: 3.0,
+                      ),
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(181, 228, 136, 74),
+                        width: 3.0,
+                      ),
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(181, 228, 136, 74),
+                        width: 2.5,
+                      ),
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 40,
+                      horizontal: 12,
+                    ),
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.8),
+                  ),
+                  maxLines: 5,
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+                  child: Text(
+                    'CPF',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(181, 228, 136, 74),
+                    ),
+                  ),
+                ),
+                TextFormField(
+                  controller: _commentsController,
+                  decoration: InputDecoration(
+                    hintText: 'Digite seu cpf',
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(181, 228, 136, 74),
+                        width: 3.0,
+                      ),
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(181, 228, 136, 74),
+                        width: 3.0,
+                      ),
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(181, 228, 136, 74),
+                        width: 2.5,
+                      ),
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.8),
+                  ),
+                  maxLines: 1,
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+                  child: Text(
+                    'Nome',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(181, 228, 136, 74),
+                    ),
+                  ),
+                ),
+                TextFormField(
+                  controller: _commentsController,
+                  decoration: InputDecoration(
+                    hintText: 'Digite seu nome',
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(181, 228, 136, 74),
+                        width: 3.0,
+                      ),
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(181, 228, 136, 74),
+                        width: 3.0,
+                      ),
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(181, 228, 136, 74),
+                        width: 2.5,
+                      ),
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.8),
+                  ),
+                  maxLines: 1,
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+                  child: Text(
+                    'Email',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(181, 228, 136, 74),
+                    ),
+                  ),
+                ),
+                TextFormField(
+                  controller: _commentsController,
+                  decoration: InputDecoration(
+                    hintText: 'Digite seu email',
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(181, 228, 136, 74),
+                        width: 3.0,
+                      ),
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(181, 228, 136, 74),
+                        width: 3.0,
+                      ),
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(181, 228, 136, 74),
+                        width: 2.5,
+                      ),
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.8),
+                  ),
+                  maxLines: 1,
+                  style: TextStyle(fontSize: 16),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
