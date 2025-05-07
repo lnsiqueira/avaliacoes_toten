@@ -30,7 +30,6 @@ class _CustomerInfoFormState extends State<CustomerInfoForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Campo Nome
           const Text('Nome:'),
           TextFormField(
             controller: _nameController,
@@ -46,8 +45,6 @@ class _CustomerInfoFormState extends State<CustomerInfoForm> {
             },
           ),
           const SizedBox(height: 16),
-
-          // Campo E-mail
           const Text('E-mail:'),
           TextFormField(
             controller: _emailController,
@@ -67,8 +64,6 @@ class _CustomerInfoFormState extends State<CustomerInfoForm> {
             },
           ),
           const SizedBox(height: 16),
-
-          // Campo Profissão
           const Text('Profissão:'),
           TextFormField(
             controller: _professionController,
@@ -78,8 +73,6 @@ class _CustomerInfoFormState extends State<CustomerInfoForm> {
             ),
           ),
           const SizedBox(height: 16),
-
-          // Campo Comentários
           const Text('Comentários (opcional):'),
           TextFormField(
             controller: _commentsController,
@@ -92,13 +85,10 @@ class _CustomerInfoFormState extends State<CustomerInfoForm> {
             maxLines: 5,
           ),
           const SizedBox(height: 24),
-
-          // Botão de Envio
           Center(
             child: ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
-                  // Processar os dados do formulário
                   debugPrint('Nome: ${_nameController.text}');
                   debugPrint('E-mail: ${_emailController.text}');
                   debugPrint('Profissão: ${_professionController.text}');
