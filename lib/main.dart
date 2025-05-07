@@ -28,6 +28,7 @@ class MyApp extends StatelessWidget {
       home: GestureDetector(
           onTap: () {
             SystemChannels.textInput.invokeMethod('TextInput.hide');
+            SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
           },
           child: const MyHomePage(title: 'Selecionar Filial')),
     );
@@ -175,6 +176,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (codEmpresa != null) {
       // Recuperar os dados salvos
       filialModel = FilialModel(
+        id: prefs.getString('id') ?? '',
         apelido: prefs.getString('apelido') ?? '',
         codEmpresa: codEmpresa,
         filial: prefs.getString('filial') ?? '',
@@ -219,9 +221,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     if (filialSelecionada && filialModel != null) {
-      return PaginaAvaliacao(
-          // model: filialModel!
-          );
+      return PaginaAvaliacao(model: filialModel!);
     }
 
     return Scaffold(
