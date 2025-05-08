@@ -29,26 +29,16 @@ extension AvaliacaoDescricao on Avaliacao {
 
   String get emoji {
     switch (this) {
-      // case Avaliacao.completamenteInsatisfeito:
-      //   return '😡';
-      // case Avaliacao.insatisfeito:
-      //   return '🙁';
-      // case Avaliacao.indiferente:
-      //   return '😐';
-      // case Avaliacao.satisfeito:
-      //   return '🙂';
-      // case Avaliacao.completamenteSatisfeito:
-      //   return '😍';
       case Avaliacao.completamenteInsatisfeito:
-        return 'A';
+        return '😡';
       case Avaliacao.insatisfeito:
-        return 'B';
+        return '🙁';
       case Avaliacao.indiferente:
-        return 'C';
+        return '😐';
       case Avaliacao.satisfeito:
-        return 'D';
+        return '🙂';
       case Avaliacao.completamenteSatisfeito:
-        return 'E';
+        return '😍';
     }
   }
 }
