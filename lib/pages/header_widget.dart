@@ -6,11 +6,16 @@ class HeaderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Map<String, String>> emojis = [
-      {'emoji': '😡', 'label': 'Muito Insatisfeito'},
-      {'emoji': '😞', 'label': 'Insatisfeito'},
-      {'emoji': '😐', 'label': 'Neutro'},
-      {'emoji': '😊', 'label': 'Satisfeito'},
-      {'emoji': '😍', 'label': 'Muito Satisfeito'},
+      // {'emoji': '😡', 'label': 'Muito Insatisfeito'},
+      // {'emoji': '😞', 'label': 'Insatisfeito'},
+      // {'emoji': '😐', 'label': 'Neutro'},
+      // {'emoji': '😊', 'label': 'Satisfeito'},
+      // {'emoji': '😍', 'label': 'Muito Satisfeito'},
+      {'emoji': 'A', 'label': 'Muito Insatisfeito'},
+      {'emoji': 'B', 'label': 'Insatisfeito'},
+      {'emoji': 'C', 'label': 'Neutro'},
+      {'emoji': 'D', 'label': 'Satisfeito'},
+      {'emoji': 'E', 'label': 'Muito Satisfeito'},
     ];
 
     return Padding(
