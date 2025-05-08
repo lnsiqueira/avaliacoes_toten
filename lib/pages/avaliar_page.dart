@@ -109,6 +109,7 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
       'data_envio': FieldValue.serverTimestamp(),
       'codEmpresa': '1',
       'codFilial': widget.model.id,
+      'celular': _phoneController.text,
     };
 
     await FirebaseFirestore.instance.collection('avaliacoes').add(dados);
