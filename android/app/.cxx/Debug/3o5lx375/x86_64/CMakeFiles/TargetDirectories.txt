@@ -1,0 +1,2 @@
+/Users/lucianonunesdesiqueira/Desktop/Free/FoodAutomation/src/avaliacoes_toten/android/app/.cxx/Debug/3o5lx375/x86_64/CMakeFiles/edit_cache.dir
+/Users/lucianonunesdesiqueira/Desktop/Free/FoodAutomation/src/avaliacoes_toten/android/app/.cxx/Debug/3o5lx375/x86_64/CMakeFiles/rebuild_cache.dir
