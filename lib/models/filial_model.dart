@@ -37,6 +37,7 @@ class FilialModel {
       'passwordApiBratter': passwordApiBratter,
       'urlApiBratter': urlApiBratter,
       'userApiBratter': userApiBratter,
+      'id': id,
     };
   }
 }

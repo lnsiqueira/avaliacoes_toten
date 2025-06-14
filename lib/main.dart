@@ -26,11 +26,12 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: GestureDetector(
-          onTap: () {
-            SystemChannels.textInput.invokeMethod('TextInput.hide');
-            SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-          },
-          child: const MyHomePage(title: 'Selecionar Filial')),
+        onTap: () {
+          SystemChannels.textInput.invokeMethod('TextInput.hide');
+          SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+        },
+        child: const MyHomePage(title: 'Selecionar Filial'),
+      ),
     );
   }
 }
@@ -45,7 +46,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   bool isLoading = true;
-  bool filialSelecionada = false;
   List<Map<String, dynamic>> filiais = [];
   String? selectedFilialId;
   FilialModel? filialModel;
@@ -70,10 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
         urlApiBratter: prefs.getString('urlApiBratter') ?? '',
         userApiBratter: prefs.getString('userApiBratter') ?? '',
       );
-      setState(() {
-        filialSelecionada = true;
-        isLoading = false;
-      });
+      navegarParaAvaliacao();
     } else {
       final snapshot =
           await FirebaseFirestore.instance.collection('Filial').get();
@@ -89,12 +86,20 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> salvarFilial(Map<String, dynamic> filial) async {
     final prefs = await SharedPreferences.getInstance();
     filialModel = FilialModel.fromMap(filial);
+
     for (var entry in filialModel!.toPrefsMap().entries) {
       await prefs.setString(entry.key, entry.value);
     }
-    setState(() {
-      filialSelecionada = true;
-    });
+
+    navegarParaAvaliacao();
+  }
+
+  void navegarParaAvaliacao() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => PaginaAvaliacao(model: filialModel!),
+      ),
+    );
   }
 
   @override
@@ -105,22 +110,19 @@ class _MyHomePageState extends State<MyHomePage> {
       );
     }
 
-    if (filialSelecionada && filialModel != null) {
-      return PaginaAvaliacao(model: filialModel!);
-    }
-
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       body: Center(
         child: DropdownButton<String>(
           hint: const Text("Selecione a filial"),
           value: selectedFilialId,
-          onChanged: (String? newValue) {
+          onChanged: (String? newValue) async {
             setState(() {
               selectedFilialId = newValue;
             });
-            final filial = filiais.firstWhere((f) => f['id'] == newValue);
-            salvarFilial(filial);
+            final filialSelecionada =
+                filiais.firstWhere((f) => f['id'] == newValue);
+            await salvarFilial(filialSelecionada);
           },
           items: filiais.map((f) {
             return DropdownMenuItem<String>(

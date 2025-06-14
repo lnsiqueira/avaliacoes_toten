@@ -67,7 +67,7 @@ class EmojiSelector extends StatelessWidget {
         return GestureDetector(
           onTap: () => onChanged(avaliacao),
           child: AnimatedScale(
-            scale: isSelected ? 1.3 : 1.0,
+            scale: isSelected ? 1.6 : 1.3,
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeOutBack,
             child: AnimatedOpacity(
@@ -99,7 +99,6 @@ class PaginaAvaliacao extends StatefulWidget {
 class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
   final ScrollController _scrollController = ScrollController();
   Future<void> enviarAvaliacaoParaFirestore() async {
-    // Verificar se TODOS os campos estão vazios
     final todosVazios = _nomeController.text.isEmpty &&
         _cpfController.text.isEmpty &&
         _emailController.text.isEmpty &&
@@ -125,9 +124,18 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
 
     try {
       final prefs = await SharedPreferences.getInstance();
-      final filialId = prefs.getString('id') ?? widget.model.id;
 
-      if (filialId.isEmpty) {
+      final filialModel = FilialModel(
+        id: prefs.getString('id') ?? widget.model.id,
+        apelido: prefs.getString('apelido') ?? '',
+        codEmpresa: prefs.getString('codEmpresa') ?? '',
+        filial: prefs.getString('filial') ?? '',
+        passwordApiBratter: prefs.getString('passwordApiBratter') ?? '',
+        urlApiBratter: prefs.getString('urlApiBratter') ?? '',
+        userApiBratter: prefs.getString('userApiBratter') ?? '',
+      );
+
+      if (filialModel.id.isEmpty) {
         throw Exception('ID da filial não encontrado');
       }
 
@@ -140,20 +148,20 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
           return MapEntry(pergunta, avaliacao?.toString() ?? 'Não respondido');
         }),
         'data_envio': FieldValue.serverTimestamp(),
-        'codEmpresa': '1',
-        'codFilial': filialId,
+        'codEmpresa': filialModel.codEmpresa,
+        'codFilial': filialModel.id,
       };
 
       final filialDocRef = FirebaseFirestore.instance
           .collection('filiais_avaliacoes')
-          .doc(filialId);
+          .doc(filialModel.id);
 
       final docSnapshot = await filialDocRef.get();
 
       if (!docSnapshot.exists) {
         await filialDocRef.set({
-          'filial_id': filialId,
-          'nome_filial': widget.model.apelido,
+          'filial_id': filialModel.id,
+          'nome_filial': filialModel.apelido,
           'data_criacao': FieldValue.serverTimestamp(),
           'total_avaliacoes': 0,
         });
@@ -165,9 +173,11 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
         'total_avaliacoes': FieldValue.increment(1),
         'ultima_avaliacao': FieldValue.serverTimestamp(),
       });
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Avaliação enviada com sucesso!')),
       );
+
       _nomeController.clear();
       _cpfController.clear();
       _emailController.clear();
@@ -381,14 +391,9 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
               onPressed: () async {
                 try {
                   await enviarAvaliacaoParaFirestore();
-                  // ScaffoldMessenger.of(context).showSnackBar(
-                  //   SnackBar(content: Text('Avaliação enviada com sucesso!')),
-                  // );
 
-                  // Limpa todos os campos
                   _limparFormulario();
 
-                  // Rola para o topo
                   _scrollController.animateTo(
                     0,
                     duration: Duration(milliseconds: 300),
@@ -399,11 +404,6 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
                     SnackBar(content: Text('Erro ao enviar: ${e.toString()}')),
                   );
                 }
-
-                // await enviarAvaliacaoParaFirestore();
-                // ScaffoldMessenger.of(context).showSnackBar(
-                //   SnackBar(content: Text('Avaliação enviada com sucesso!')),
-                // );
               },
               child: const Text('Enviar'),
             ),
@@ -449,8 +449,8 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
                                   child: Text(
                                     pergunta,
                                     style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
@@ -478,6 +478,53 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 0, horizontal: 4),
+                        child: Text(
+                          'Nome',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromARGB(181, 228, 136, 74),
+                          ),
+                        ),
+                      ),
+                      TextFormField(
+                        controller: _nomeController,
+                        focusNode: _nomeFocusNode,
+                        decoration: InputDecoration(
+                          hintText: 'Digite seu nome',
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color.fromARGB(181, 228, 136, 74),
+                              width: 3.0,
+                            ),
+                            borderRadius: BorderRadius.circular(16.0),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color.fromARGB(181, 228, 136, 74),
+                              width: 3.0,
+                            ),
+                            borderRadius: BorderRadius.circular(16.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color.fromARGB(181, 228, 136, 74),
+                              width: 2.5,
+                            ),
+                            borderRadius: BorderRadius.circular(16.0),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white.withOpacity(0.8),
+                        ),
+                        maxLines: 1,
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      SizedBox(
+                        height: 12,
+                      ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             vertical: 0, horizontal: 4),
@@ -550,53 +597,6 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
                         ],
                         decoration: InputDecoration(
                           hintText: 'Digite seu cpf',
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color.fromARGB(181, 228, 136, 74),
-                              width: 3.0,
-                            ),
-                            borderRadius: BorderRadius.circular(16.0),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color.fromARGB(181, 228, 136, 74),
-                              width: 3.0,
-                            ),
-                            borderRadius: BorderRadius.circular(16.0),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color.fromARGB(181, 228, 136, 74),
-                              width: 2.5,
-                            ),
-                            borderRadius: BorderRadius.circular(16.0),
-                          ),
-                          filled: true,
-                          fillColor: Colors.white.withOpacity(0.8),
-                        ),
-                        maxLines: 1,
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      SizedBox(
-                        height: 12,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 0, horizontal: 4),
-                        child: Text(
-                          'Nome',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Color.fromARGB(181, 228, 136, 74),
-                          ),
-                        ),
-                      ),
-                      TextFormField(
-                        controller: _nomeController,
-                        focusNode: _nomeFocusNode,
-                        decoration: InputDecoration(
-                          hintText: 'Digite seu nome',
                           border: OutlineInputBorder(
                             borderSide: BorderSide(
                               color: Color.fromARGB(181, 228, 136, 74),
