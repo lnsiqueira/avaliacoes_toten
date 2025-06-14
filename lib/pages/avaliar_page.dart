@@ -195,6 +195,21 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
         ),
       );
     }
+    final Map<String, dynamic> dados = {
+      'comentario': _commentsController.text,
+      'cpf': _cpfController.text,
+      'nome': _nomeController.text,
+      'email': _emailController.text,
+      'avaliacoes': respostas.map((pergunta, avaliacao) {
+        return MapEntry(pergunta, avaliacao?.toString() ?? 'Não respondido');
+      }),
+      'data_envio': FieldValue.serverTimestamp(),
+      'codEmpresa': '1',
+      'codFilial': widget.model.id,
+      'celular': _phoneController.text,
+    };
+
+    await FirebaseFirestore.instance.collection('avaliacoes').add(dados);
   }
 
   final TextEditingController _commentsController = TextEditingController();
