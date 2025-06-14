@@ -124,7 +124,6 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
     }
 
     try {
-      // Obter o ID da filial do SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       final filialId = prefs.getString('id') ?? widget.model.id;
 
@@ -145,12 +144,10 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
         'codFilial': filialId,
       };
 
-      // Referência ao documento da filial
       final filialDocRef = FirebaseFirestore.instance
           .collection('filiais_avaliacoes')
           .doc(filialId);
 
-      // Verificar se o documento existe
       final docSnapshot = await filialDocRef.get();
 
       if (!docSnapshot.exists) {
@@ -162,24 +159,20 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
         });
       }
 
-      // Enviar avaliação
       await filialDocRef.collection('avaliacoes').add(dados);
 
-      // Atualizar contadores
       await filialDocRef.update({
         'total_avaliacoes': FieldValue.increment(1),
         'ultima_avaliacao': FieldValue.serverTimestamp(),
       });
-
-      // Limpar campos após envio (opcional)
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Avaliação enviada com sucesso!')),
+      );
       _nomeController.clear();
       _cpfController.clear();
       _emailController.clear();
       _commentsController.clear();
       setState(() => respostas.clear());
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Avaliação enviada com sucesso!')),
-      );
     } catch (e) {
       showDialog(
         context: context,
@@ -195,21 +188,6 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
         ),
       );
     }
-    final Map<String, dynamic> dados = {
-      'comentario': _commentsController.text,
-      'cpf': _cpfController.text,
-      'nome': _nomeController.text,
-      'email': _emailController.text,
-      'avaliacoes': respostas.map((pergunta, avaliacao) {
-        return MapEntry(pergunta, avaliacao?.toString() ?? 'Não respondido');
-      }),
-      'data_envio': FieldValue.serverTimestamp(),
-      'codEmpresa': '1',
-      'codFilial': widget.model.id,
-      'celular': _phoneController.text,
-    };
-
-    await FirebaseFirestore.instance.collection('avaliacoes').add(dados);
   }
 
   final TextEditingController _commentsController = TextEditingController();
