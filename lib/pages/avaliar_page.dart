@@ -98,6 +98,9 @@ class PaginaAvaliacao extends StatefulWidget {
 
 class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
   final ScrollController _scrollController = ScrollController();
+  int? _avaliacao; // Armazena a avaliação do usuário
+  bool _respondendoPesquisa = false;
+
   Future<void> enviarAvaliacaoParaFirestore() async {
     final todosVazios = _nomeController.text.isEmpty &&
         _cpfController.text.isEmpty &&
@@ -178,6 +181,9 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
         SnackBar(content: Text('Avaliação enviada com sucesso!')),
       );
 
+      await _mostrarFeedback(context);
+      _showSurveyPopup();
+
       _nomeController.clear();
       _cpfController.clear();
       _emailController.clear();
@@ -198,6 +204,185 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
         ),
       );
     }
+  }
+
+  Future<void> _mostrarFeedback(BuildContext context) async {
+    // Aguarda o delay antes de mostrar o dialog
+    await Future.delayed(Duration(milliseconds: 500));
+
+    // Mostra o dialog e aguarda até que seja fechado
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Obrigado!', textAlign: TextAlign.center),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.thumb_up, color: Colors.green, size: 50),
+              SizedBox(height: 16),
+              Text(
+                'Agradecemos sua participação na pesquisa!',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: Text('Fechar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+        );
+      },
+    );
+
+    // Código aqui será executado após o dialog ser fechado
+    print('Dialog fechado');
+  }
+
+  // void _mostrarFeedback(BuildContext context) {
+  //   // Mostra o popup de agradecimento após um pequeno delay
+  //   Future.delayed(Duration(milliseconds: 500), () {
+  //     showDialog(
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return AlertDialog(
+  //           title: Text('Obrigado!', textAlign: TextAlign.center),
+  //           content: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: [
+  //               Icon(Icons.thumb_up, color: Colors.green, size: 50),
+  //               SizedBox(height: 16),
+  //               Text(
+  //                 'Agradecemos sua participação na pesquisa!',
+  //                 textAlign: TextAlign.center,
+  //                 style: TextStyle(fontSize: 16),
+  //               ),
+  //             ],
+  //           ),
+  //           actions: [
+  //             TextButton(
+  //               child: Text('Fechar'),
+  //               onPressed: () {
+  //                 Navigator.of(context).pop();
+  //               },
+  //             ),
+  //           ],
+  //           shape: RoundedRectangleBorder(
+  //             borderRadius: BorderRadius.circular(20),
+  //           ),
+  //         );
+  //       },
+  //     );
+  //   });
+  // }
+
+  void _showSurveyPopup() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          contentPadding: EdgeInsets.all(20),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                'assets/logo-padaria.png',
+                height: 100,
+                width: 100,
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Ajude-nos a melhorar!',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.brown[800],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 10),
+              Text(
+                'Por favor, avalie sua experiência conosco:',
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20),
+
+              // Componente de avaliação com estrelas
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(5, (index) {
+                  return IconButton(
+                    icon: Icon(
+                      _avaliacao != null && index < _avaliacao!
+                          ? Icons.star
+                          : Icons.star_border,
+                      color: Colors.amber,
+                      size: 30,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _avaliacao = index + 1;
+                      });
+                    },
+                  );
+                }),
+              ),
+              SizedBox(height: 20),
+              if (_avaliacao != null)
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Comentários (opcional)',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 3,
+                ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                      ),
+                      child: Text('Ok'),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+                  // ElevatedButton(
+                  //   style: ElevatedButton.styleFrom(
+                  //     backgroundColor: Colors.brown,
+                  //   ),
+                  //   child: Text('Ok'),
+                  //   onPressed: _avaliacao != null
+                  //       ? () {
+                  //           setState(() {
+                  //             _respondendoPesquisa = false;
+                  //           });
+                  //           Navigator.pop(context);
+                  //           // _mostrarAgradecimento();
+                  //         }
+                  //       : null,
+                  // ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   final TextEditingController _commentsController = TextEditingController();
@@ -268,6 +453,8 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
     secoes.values.expand((list) => list).forEach((pergunta) {
       respostas[pergunta] = null;
     });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => _showSurveyPopup());
   }
 
   @override
