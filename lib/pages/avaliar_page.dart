@@ -1200,7 +1200,7 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
         'comentarios': _commentsController.text,
         'outros': {
           'origem': 'totem',
-          'versao_formulario': '1.0',
+          'versao_formulario': '2.0',
         }
       };
 
