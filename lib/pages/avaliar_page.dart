@@ -1100,7 +1100,7 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
   final Map<String, Avaliacao?> avaliacoes = {
     'sabor': null,
     'qualidade_produtos': null,
-    'temperatura': null,
+    // 'temperatura': null,
     'variedade_produtos': null,
     'caixa_atendimento': null,
     'satisfacao_geral': null,
@@ -1108,11 +1108,11 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
 
   // Nomes amigáveis para exibição
   final Map<String, String> nomesExibicao = {
-    'sabor': 'Sabor',
+    'sabor': 'Sabor / Tempero',
     'qualidade_produtos': 'Qualidade dos Produtos',
-    'temperatura': 'Temperatura',
+    // 'temperatura': 'Temperatura',
     'variedade_produtos': 'Variedade de Produtos',
-    'caixa_atendimento': 'Atendimento no Caixa',
+    'caixa_atendimento': 'Atendimento no Serviço',
     'satisfacao_geral': 'Satisfação Geral',
   };
 
