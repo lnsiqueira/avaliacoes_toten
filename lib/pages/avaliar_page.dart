@@ -979,57 +979,95 @@ import 'package:brasil_fields/brasil_fields.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum Avaliacao {
-  completamenteInsatisfeito,
-  insatisfeito,
-  indiferente,
+  poucoSatisfeito,
   satisfeito,
-  completamenteSatisfeito,
+  muitoSatisfeito,
+  // completamenteInsatisfeito,
+  // insatisfeito,
+  // indiferente,
+  // satisfeito,
+  // completamenteSatisfeito,
 }
 
+// extension AvaliacaoDescricao on Avaliacao {
+//   String get descricao {
+//     switch (this) {
+//       case Avaliacao.completamenteInsatisfeito:
+//         return 'Completamente insatisfeito';
+//       case Avaliacao.insatisfeito:
+//         return 'Insatisfeito';
+//       case Avaliacao.indiferente:
+//         return 'Indiferente';
+//       case Avaliacao.satisfeito:
+//         return 'Satisfeito';
+//       case Avaliacao.completamenteSatisfeito:
+//         return 'Completamente satisfeito';
+//     }
+//   }
+
+//   String get emoji {
+//     switch (this) {
+//       case Avaliacao.completamenteInsatisfeito:
+//         return '😡';
+//       case Avaliacao.insatisfeito:
+//         return '🙁';
+//       case Avaliacao.indiferente:
+//         return '😐';
+//       case Avaliacao.satisfeito:
+//         return '🙂';
+//       case Avaliacao.completamenteSatisfeito:
+//         return '😍';
+//     }
+//   }
+
+//   /// Converte para número de 1 a 5
+//   int get numero {
+//     switch (this) {
+//       case Avaliacao.completamenteInsatisfeito:
+//         return 1;
+//       case Avaliacao.insatisfeito:
+//         return 2;
+//       case Avaliacao.indiferente:
+//         return 3;
+//       case Avaliacao.satisfeito:
+//         return 4;
+//       case Avaliacao.completamenteSatisfeito:
+//         return 5;
+//     }
+//   }
+// }
 extension AvaliacaoDescricao on Avaliacao {
   String get descricao {
     switch (this) {
-      case Avaliacao.completamenteInsatisfeito:
-        return 'Completamente insatisfeito';
-      case Avaliacao.insatisfeito:
-        return 'Insatisfeito';
-      case Avaliacao.indiferente:
-        return 'Indiferente';
+      case Avaliacao.poucoSatisfeito:
+        return 'Pouco Satisfeito';
       case Avaliacao.satisfeito:
         return 'Satisfeito';
-      case Avaliacao.completamenteSatisfeito:
-        return 'Completamente satisfeito';
+      case Avaliacao.muitoSatisfeito:
+        return 'Muito Satisfeito';
     }
   }
 
   String get emoji {
     switch (this) {
-      case Avaliacao.completamenteInsatisfeito:
-        return '😡';
-      case Avaliacao.insatisfeito:
+      case Avaliacao.poucoSatisfeito:
         return '🙁';
-      case Avaliacao.indiferente:
-        return '😐';
       case Avaliacao.satisfeito:
         return '🙂';
-      case Avaliacao.completamenteSatisfeito:
+      case Avaliacao.muitoSatisfeito:
         return '😍';
     }
   }
 
-  /// Converte para número de 1 a 5
+  /// Converte para número de 1 a 3
   int get numero {
     switch (this) {
-      case Avaliacao.completamenteInsatisfeito:
+      case Avaliacao.poucoSatisfeito:
         return 1;
-      case Avaliacao.insatisfeito:
-        return 2;
-      case Avaliacao.indiferente:
-        return 3;
       case Avaliacao.satisfeito:
-        return 4;
-      case Avaliacao.completamenteSatisfeito:
-        return 5;
+        return 2;
+      case Avaliacao.muitoSatisfeito:
+        return 3;
     }
   }
 }
@@ -1350,40 +1388,46 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text(
-          'Avaliação de Satisfação',
-          style: TextStyle(color: Colors.black),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 228, 136, 74),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              ),
-              onPressed: () async {
-                try {
-                  await enviarAvaliacaoParaFirestore();
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Erro ao enviar: ${e.toString()}')),
-                  );
-                }
-              },
-              child: const Text('Enviar'),
-            ),
-          ),
-        ],
-        iconTheme: const IconThemeData(color: Colors.black),
-      ),
+      // appBar: AppBar(
+      //   backgroundColor: Colors.white,
+      //   title: Row(
+      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //     children: [
+      //       const Text(
+      //         ' ',
+      //         style: TextStyle(color: Colors.black),
+      //       ),
+      //       Image.asset('assets/logo-padaria.png', height: 70),
+      //     ],
+      //   ),
+      //   // actions: [
+      //   //   Padding(
+      //   //     padding: const EdgeInsets.only(right: 16.0),
+      //   //     child: ElevatedButton(
+      //   //       style: ElevatedButton.styleFrom(
+      //   //         backgroundColor: const Color.fromARGB(255, 228, 136, 74),
+      //   //         foregroundColor: Colors.white,
+      //   //         shape: RoundedRectangleBorder(
+      //   //           borderRadius: BorderRadius.circular(12.0),
+      //   //         ),
+      //   //         padding:
+      //   //             const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      //   //       ),
+      //   //       onPressed: () async {
+      //   //         try {
+      //   //           await enviarAvaliacaoParaFirestore();
+      //   //         } catch (e) {
+      //   //           ScaffoldMessenger.of(context).showSnackBar(
+      //   //             SnackBar(content: Text('Erro ao enviar: ${e.toString()}')),
+      //   //           );
+      //   //         }
+      //   //       },
+      //   //       child: const Text('Enviar'),
+      //   //     ),
+      //   //   ),
+      //   // ],
+      //   iconTheme: const IconThemeData(color: Colors.black),
+      // ),
       body: SingleChildScrollView(
         controller: _scrollController,
         child: Padding(
@@ -1392,11 +1436,17 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Título
-              Text(
-                'Avalie sua Experiência',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Avalie sua Experiência',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  Image.asset('assets/logo-padaria.png', height: 70),
+                ],
               ),
               const SizedBox(height: 24),
 
@@ -1589,18 +1639,18 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
             contentPadding: const EdgeInsets.all(12),
           ),
         ),
-        const SizedBox(height: 16),
-        TextField(
-          controller: _emailController,
-          focusNode: _emailFocusNode,
-          decoration: InputDecoration(
-            labelText: 'Email (opcional)',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            contentPadding: const EdgeInsets.all(12),
-          ),
-        ),
+        // const SizedBox(height: 16),
+        // TextField(
+        //   controller: _emailController,
+        //   focusNode: _emailFocusNode,
+        //   decoration: InputDecoration(
+        //     labelText: 'Email (opcional)',
+        //     border: OutlineInputBorder(
+        //       borderRadius: BorderRadius.circular(8),
+        //     ),
+        //     contentPadding: const EdgeInsets.all(12),
+        //   ),
+        // ),
       ],
     );
   }
@@ -1622,20 +1672,20 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
             ),
           ),
         ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: TextField(
-            controller: _emailController,
-            focusNode: _emailFocusNode,
-            decoration: InputDecoration(
-              labelText: 'Email (opcional)',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              contentPadding: const EdgeInsets.all(12),
-            ),
-          ),
-        ),
+        // const SizedBox(width: 16),
+        // Expanded(
+        //   child: TextField(
+        //     controller: _emailController,
+        //     focusNode: _emailFocusNode,
+        //     decoration: InputDecoration(
+        //       labelText: 'Email (opcional)',
+        //       border: OutlineInputBorder(
+        //         borderRadius: BorderRadius.circular(8),
+        //       ),
+        //       contentPadding: const EdgeInsets.all(12),
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }
