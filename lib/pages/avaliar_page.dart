@@ -1128,12 +1128,13 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
   final TextEditingController _nomeController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _commentsController = TextEditingController();
-
+  final TextEditingController _matriculaController = TextEditingController();
   // Focus nodes
   final FocusNode _commentsFocusNode = FocusNode();
   final FocusNode _nomeFocusNode = FocusNode();
   final FocusNode _emailFocusNode = FocusNode();
-
+  final FocusNode _matriculaFocusNode = FocusNode();
+  bool _enviando = false;
   // Mapa de respostas para os 6 critérios principais
   final Map<String, Avaliacao?> avaliacoes = {
     'sabor': null,
@@ -1162,6 +1163,7 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
     _commentsFocusNode.addListener(_scrollToBottom);
     _nomeFocusNode.addListener(_scrollToBottom);
     _emailFocusNode.addListener(_scrollToBottom);
+    _matriculaFocusNode.addListener(_scrollToBottom);
     WidgetsBinding.instance.addPostFrameCallback((_) => _showSurveyPopup());
   }
 
@@ -1173,7 +1175,10 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
     _commentsFocusNode.dispose();
     _nomeFocusNode.dispose();
     _emailFocusNode.dispose();
+    _matriculaController.dispose();
+    _matriculaFocusNode.dispose();
     _scrollController.dispose();
+
     super.dispose();
   }
 
@@ -1190,6 +1195,27 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
   }
 
   Future<void> enviarAvaliacaoParaFirestore() async {
+    if (_enviando) return;
+
+    // ===== VALIDAÇÃO DA MATRÍCULA =====
+    if (_matriculaController.text.trim().isEmpty) {
+      return showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('Atenção'),
+          content: const Text(
+            'Informe o número da matrícula.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+
     // Verificar se pelo menos uma avaliação foi feita
     final todasVazias = avaliacoes.values.every((v) => v == null);
 
@@ -1208,6 +1234,10 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
         ),
       );
     }
+
+    setState(() {
+      _enviando = true;
+    });
 
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -1234,6 +1264,7 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
         'id_filial': filialId,
         'data_hora_resposta': Timestamp.now(),
         'usuario_id': usuarioId,
+        'matricula': _matriculaController.text.trim(),
         'avaliacoes': avaliacoesMap,
         'comentarios': _commentsController.text,
         'outros': {
@@ -1272,6 +1303,12 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
           ],
         ),
       );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _enviando = false;
+        });
+      }
     }
   }
 
@@ -1368,7 +1405,7 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
       _commentsController.clear();
       _nomeController.clear();
       _emailController.clear();
-
+      _matriculaController.clear();
       for (var key in avaliacoes.keys) {
         avaliacoes[key] = null;
       }
@@ -1376,6 +1413,7 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
       _commentsFocusNode.unfocus();
       _nomeFocusNode.unfocus();
       _emailFocusNode.unfocus();
+      _matriculaFocusNode.unfocus();
     });
   }
 
@@ -1533,19 +1571,38 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
                 ),
               ),
               const SizedBox(height: 24),
-
-              // Seção de dados do usuário (opcionais)
               Text(
-                'Seus Dados (opcional)',
+                'Matrícula (obrigatório)',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
               ),
               const SizedBox(height: 12),
-              if (isLandscape && !isMobile)
-                _buildDadosGridLandscape()
-              else
-                _buildDadosGridPortrait(),
+              TextField(
+                focusNode: _matriculaFocusNode,
+                controller: _matriculaController,
+                // keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Número da Matrícula*',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  contentPadding: const EdgeInsets.all(12),
+                ),
+              ),
+              // const SizedBox(height: 16),
+              // // // Seção de dados do usuário (opcionais)
+              // // Text(
+              // //   'Seus Dados (opcional)',
+              // //   style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              // //         fontWeight: FontWeight.bold,
+              // //       ),
+              // // ),
+              // const SizedBox(height: 12),
+              // if (isLandscape && !isMobile)
+              //   _buildDadosGridLandscape()
+              // else
+              //   _buildDadosGridPortrait(),
 
               const SizedBox(height: 32),
               SizedBox(
@@ -1560,35 +1617,47 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
                     ),
                     elevation: 4,
                   ),
-                  onPressed: () async {
-                    try {
-                      await enviarAvaliacaoParaFirestore();
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Erro ao enviar: ${e.toString()}'),
+                  onPressed: _enviando
+                      ? null
+                      : () async {
+                          try {
+                            await enviarAvaliacaoParaFirestore();
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content:
+                                    Text('Erro ao enviar: ${e.toString()}'),
+                              ),
+                            );
+                          }
+                        },
+                  child: _enviando
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.send,
+                              size: 20,
+                              color: Colors.white,
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              'Enviar Avaliação',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                      );
-                    }
-                  },
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.send,
-                        size: 20,
-                        color: Colors.white,
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        'Enviar Avaliação',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
               )
             ],
