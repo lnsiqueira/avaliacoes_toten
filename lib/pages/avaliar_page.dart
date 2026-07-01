@@ -1449,7 +1449,61 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
                 ],
               ),
               const SizedBox(height: 24),
+// Cabeçalho da escala de avaliação
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: const [
+                    Column(
+                      children: [
+                        Text('🙁', style: TextStyle(fontSize: 26)),
+                        SizedBox(height: 4),
+                        Text(
+                          'Regular',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Text('🙂', style: TextStyle(fontSize: 26)),
+                        SizedBox(height: 4),
+                        Text(
+                          'Bom',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Text('😍', style: TextStyle(fontSize: 26)),
+                        SizedBox(height: 4),
+                        Text(
+                          'Ótimo',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
 
+              const SizedBox(height: 24),
               // Grid responsivo de avaliações
               if (isLandscape && !isMobile)
                 _buildAvaliacoesGridLandscape()
