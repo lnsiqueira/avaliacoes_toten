@@ -1198,13 +1198,35 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
     if (_enviando) return;
 
     // ===== VALIDAÇÃO DA MATRÍCULA =====
-    if (_matriculaController.text.trim().isEmpty) {
+
+    final matricula = _matriculaController.text.trim();
+
+    final bool isEmail =
+        RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(matricula);
+
+    if (matricula.isEmpty) {
+      return showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('Atenção'),
+          content: const Text('Informe a matrícula.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (isEmail || matricula.length > 8) {
       return showDialog(
         context: context,
         builder: (_) => AlertDialog(
           title: const Text('Atenção'),
           content: const Text(
-            'Informe o número da matrícula.',
+            'A matrícula deve conter no máximo 8 caracteres e não pode ser um e-mail.',
           ),
           actions: [
             TextButton(
@@ -1215,6 +1237,23 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
         ),
       );
     }
+    // if (_matriculaController.text.trim().isEmpty) {
+    //   return showDialog(
+    //     context: context,
+    //     builder: (_) => AlertDialog(
+    //       title: const Text('Atenção'),
+    //       content: const Text(
+    //         'Informe o número da matrícula.',
+    //       ),
+    //       actions: [
+    //         TextButton(
+    //           onPressed: () => Navigator.pop(context),
+    //           child: const Text('OK'),
+    //         ),
+    //       ],
+    //     ),
+    //   );
+    // }
 
     // Verificar se pelo menos uma avaliação foi feita
     final todasVazias = avaliacoes.values.every((v) => v == null);
