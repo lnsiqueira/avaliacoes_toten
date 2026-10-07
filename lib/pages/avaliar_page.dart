@@ -1128,12 +1128,12 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
   final TextEditingController _nomeController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _commentsController = TextEditingController();
-  final TextEditingController _matriculaController = TextEditingController();
+  final TextEditingController _areaController = TextEditingController();
   // Focus nodes
   final FocusNode _commentsFocusNode = FocusNode();
   final FocusNode _nomeFocusNode = FocusNode();
   final FocusNode _emailFocusNode = FocusNode();
-  final FocusNode _matriculaFocusNode = FocusNode();
+  final FocusNode _areaFocusNode = FocusNode();
   bool _enviando = false;
   // Mapa de respostas para os 6 critérios principais
   final Map<String, Avaliacao?> avaliacoes = {
@@ -1163,7 +1163,7 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
     _commentsFocusNode.addListener(_scrollToBottom);
     _nomeFocusNode.addListener(_scrollToBottom);
     _emailFocusNode.addListener(_scrollToBottom);
-    _matriculaFocusNode.addListener(_scrollToBottom);
+    _areaFocusNode.addListener(_scrollToBottom);
     WidgetsBinding.instance.addPostFrameCallback((_) => _showSurveyPopup());
   }
 
@@ -1175,8 +1175,8 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
     _commentsFocusNode.dispose();
     _nomeFocusNode.dispose();
     _emailFocusNode.dispose();
-    _matriculaController.dispose();
-    _matriculaFocusNode.dispose();
+    _areaController.dispose();
+    _areaFocusNode.dispose();
     _scrollController.dispose();
 
     super.dispose();
@@ -1197,19 +1197,16 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
   Future<void> enviarAvaliacaoParaFirestore() async {
     if (_enviando) return;
 
-    // ===== VALIDAÇÃO DA MATRÍCULA =====
+    // ===== VALIDAÇÃO DA ÁREA =====
 
-    final matricula = _matriculaController.text.trim();
+    final area = _areaController.text.trim();
 
-    final bool isEmail =
-        RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(matricula);
-
-    if (matricula.isEmpty) {
+    if (area.isEmpty) {
       return showDialog(
         context: context,
         builder: (_) => AlertDialog(
           title: const Text('Atenção'),
-          content: const Text('Informe a matrícula.'),
+          content: const Text('Informe a área.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -1219,41 +1216,6 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
         ),
       );
     }
-
-    if (isEmail || matricula.length > 8) {
-      return showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: const Text('Atenção'),
-          content: const Text(
-            'A matrícula deve conter no máximo 8 caracteres e não pode ser um e-mail.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
-    }
-    // if (_matriculaController.text.trim().isEmpty) {
-    //   return showDialog(
-    //     context: context,
-    //     builder: (_) => AlertDialog(
-    //       title: const Text('Atenção'),
-    //       content: const Text(
-    //         'Informe o número da matrícula.',
-    //       ),
-    //       actions: [
-    //         TextButton(
-    //           onPressed: () => Navigator.pop(context),
-    //           child: const Text('OK'),
-    //         ),
-    //       ],
-    //     ),
-    //   );
-    // }
 
     // Verificar se pelo menos uma avaliação foi feita
     final todasVazias = avaliacoes.values.every((v) => v == null);
@@ -1303,7 +1265,7 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
         'id_filial': filialId,
         'data_hora_resposta': Timestamp.now(),
         'usuario_id': usuarioId,
-        'matricula': _matriculaController.text.trim(),
+        'area': area,
         'avaliacoes': avaliacoesMap,
         'comentarios': _commentsController.text,
         'outros': {
@@ -1444,7 +1406,7 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
       _commentsController.clear();
       _nomeController.clear();
       _emailController.clear();
-      _matriculaController.clear();
+      _areaController.clear();
       for (var key in avaliacoes.keys) {
         avaliacoes[key] = null;
       }
@@ -1452,7 +1414,7 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
       _commentsFocusNode.unfocus();
       _nomeFocusNode.unfocus();
       _emailFocusNode.unfocus();
-      _matriculaFocusNode.unfocus();
+      _areaFocusNode.unfocus();
     });
   }
 
@@ -1611,18 +1573,19 @@ class _PaginaAvaliacaoState extends State<PaginaAvaliacao> {
               ),
               const SizedBox(height: 24),
               Text(
-                'Matrícula (obrigatório)',
+                'Área (obrigatório)',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
               ),
               const SizedBox(height: 12),
               TextField(
-                focusNode: _matriculaFocusNode,
-                controller: _matriculaController,
-                // keyboardType: TextInputType.number,
+                focusNode: _areaFocusNode,
+                controller: _areaController,
+                keyboardType: TextInputType.text,
+                textCapitalization: TextCapitalization.sentences,
                 decoration: InputDecoration(
-                  labelText: 'Número da Matrícula*',
+                  labelText: 'Área*',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
